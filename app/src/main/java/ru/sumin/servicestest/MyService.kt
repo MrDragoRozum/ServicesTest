@@ -21,15 +21,17 @@ class MyService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val start = intent?.getIntExtra(EXTRA_START, 0) ?: 0
         log("onStartCommand()")
         scope.launch {
-            for(step in 0 until 1000) {
+            for (step in start until start + 100) {
                 delay(500)
                 log("onStartCommand steps: $step")
             }
         }
-        return super.onStartCommand(intent, flags, startId)
+        return START_REDELIVER_INTENT
     }
+
     override fun onBind(p0: Intent?): IBinder? {
         TODO("Not yet implemented")
     }
@@ -45,6 +47,10 @@ class MyService : Service() {
     }
 
     companion object {
-        fun newInstance(context: Context) = Intent(context, MyService::class.java)
+        private const val EXTRA_START = "start"
+        fun newInstance(context: Context, start: Int) =
+            Intent(context, MyService::class.java).apply {
+                putExtra(EXTRA_START, start)
+            }
     }
 }
