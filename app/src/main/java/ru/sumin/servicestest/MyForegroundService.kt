@@ -1,6 +1,5 @@
 package ru.sumin.servicestest
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -33,7 +32,7 @@ class MyForegroundService : Service() {
             val notificationChannel = NotificationChannel(
                 EXTRA_CHANNEL_ID,
                 EXTRA_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager.createNotificationChannel(notificationChannel)
         }
@@ -50,10 +49,11 @@ class MyForegroundService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         log("onStartCommand()")
         scope.launch {
-            for (step in 0 until 100) {
+            for (step in 0 until 3) {
                 delay(500)
                 log("onStartCommand steps: $step")
             }
+            stopSelf()
         }
         return START_STICKY
     }
