@@ -14,8 +14,6 @@ import kotlinx.coroutines.cancel
 
 class MyIntentService : IntentService(NAME) {
 
-    private val scope = CoroutineScope(Dispatchers.Main)
-
     override fun onCreate() {
         super.onCreate()
         log("onCreate()")
@@ -55,7 +53,6 @@ class MyIntentService : IntentService(NAME) {
     override fun onDestroy() {
         super.onDestroy()
         log("onDestroy()")
-        scope.cancel()
     }
 
     private fun log(message: String) {
