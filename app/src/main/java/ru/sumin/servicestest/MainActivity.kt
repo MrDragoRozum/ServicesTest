@@ -1,5 +1,8 @@
 package ru.sumin.servicestest
 
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -23,6 +26,17 @@ class MainActivity : AppCompatActivity() {
         }
         binding.intentService.setOnClickListener {
             ContextCompat.startForegroundService(this, MyIntentService.newInstance(this))
+        }
+        binding.jobScheduler.setOnClickListener {
+            val componentName = ComponentName(this, MyJobService::class.java)
+
+            val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .setPeriodic(900000)
+                .build()
+
+            val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+            scheduler.schedule(jobInfo)
         }
     }
 }
