@@ -2,7 +2,9 @@ package ru.sumin.servicestest
 
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
+import android.app.job.JobWorkItem
 import android.content.ComponentName
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -13,6 +15,8 @@ class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+
+    private var page = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,11 +36,12 @@ class MainActivity : AppCompatActivity() {
 
             val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
-                .setPeriodic(900000)
                 .build()
 
-            val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
-            scheduler.schedule(jobInfo)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+                scheduler.enqueue(jobInfo, JobWorkItem(MyJobService.newInstance(page++)))
+            }
         }
     }
 }
