@@ -29,7 +29,7 @@ class MyIntentService2 : IntentService(NAME) {
     }
 
     private fun log(message: String) {
-        Log.d("TAG_FOREGROUND_SERVICE", message)
+        Log.d("TAG_INTENT_SERVICE2", message)
     }
 
     companion object {
