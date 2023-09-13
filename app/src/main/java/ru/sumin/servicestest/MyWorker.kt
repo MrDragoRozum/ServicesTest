@@ -31,7 +31,7 @@ class MyWorker(
         const val PAGE = "page"
         const val NAME_WORK = "name work"
 
-        fun makeRequest(context: Context, page: Int) =
+        fun makeRequest(page: Int) =
             OneTimeWorkRequestBuilder<MyWorker>()
                 .setInputData(workDataOf(PAGE to page))
                 .setConstraints(makeConstraints())
