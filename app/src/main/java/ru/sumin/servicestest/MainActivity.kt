@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 .enqueueUniqueWork(
                     MyWorker.NAME_WORK,
                     ExistingWorkPolicy.APPEND,
-                    MyWorker.makeRequest(this, page++)
+                    MyWorker.makeRequest(page++)
                 )
 
         }

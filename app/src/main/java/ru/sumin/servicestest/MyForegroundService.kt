@@ -19,15 +19,22 @@ class MyForegroundService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.Main)
 
+    private val notificationBuilder by lazy {
+        notificationCompatBuilder()
+    }
+
+    private val notificationManager by lazy {
+        getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    }
+
     override fun onCreate() {
         super.onCreate()
         log("onCreate()")
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, createNotificationCompat())
+        startForeground(NOTIFICATION_ID, notificationBuilder.build())
     }
 
     private fun createNotificationChannel() {
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel = NotificationChannel(
                 EXTRA_CHANNEL_ID,
@@ -39,19 +46,23 @@ class MyForegroundService : Service() {
 
     }
 
-    private fun createNotificationCompat() = NotificationCompat
+    private fun notificationCompatBuilder() = NotificationCompat
         .Builder(this, EXTRA_CHANNEL_ID)
         .setContentTitle("Сервис")
         .setContentText("Сервис работает в фоновом режиме!")
         .setSmallIcon(R.drawable.notification_bg)
-        .build()
+        .setProgress(MAX_PROGRESS, DEFAULT_START_PARAMETER, false)
+        .setOnlyAlertOnce(true)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         log("onStartCommand()")
         scope.launch {
-            for (step in 0 until 3) {
+            for (progress in 0..100 step 5) {
                 delay(500)
-                log("onStartCommand steps: $step")
+                log("onStartCommand steps: $progress")
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder
+                        .setProgress(MAX_PROGRESS, progress, false)
+                        .build())
             }
             stopSelf()
         }
@@ -77,5 +88,7 @@ class MyForegroundService : Service() {
         private const val EXTRA_CHANNEL_ID = "channel_id"
         private const val EXTRA_CHANNEL_NAME = "Тест"
         private const val NOTIFICATION_ID = 1
+        private const val MAX_PROGRESS = 100
+        private const val DEFAULT_START_PARAMETER = 0
     }
 }
