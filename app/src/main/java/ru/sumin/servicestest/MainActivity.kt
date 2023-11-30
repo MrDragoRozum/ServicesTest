@@ -4,8 +4,11 @@ import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.app.job.JobWorkItem
 import android.content.ComponentName
+import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.work.ExistingWorkPolicy
@@ -19,6 +22,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var page = 0
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = (service as? MyForegroundService.LocalBind) ?: return
+            val foregroundService = binder.getForegroundService()
+            foregroundService.progressListener = {
+                binding.progressBarLoading.progress = it
+            }
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.d("onServiceDisconnected", "Disconnected: ${name?.className}")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,5 +76,19 @@ class MainActivity : AppCompatActivity() {
                 )
 
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        bindService(
+            MyForegroundService.newInstance(this),
+            serviceConnection,
+            0
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(serviceConnection)
     }
 }
